@@ -4,7 +4,13 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +30,19 @@ public class UserController {
 	
 	@GetMapping(path="/users")
 	public ResponseEntity<List<User>> getAllUsers(){
-		return userService.getAllUsers();
+		List<User> users= userService.getAllUsers();
+		return new ResponseEntity<List<User>>(users,HttpStatus.OK);
 	}
 	
 	@GetMapping(path="/users/{id}")
-	public ResponseEntity<User> getUser(@PathVariable int id) {
-		return userService.getUser(id);
+	public ResponseEntity<Object> getUser(@PathVariable int id) {
+		User user= userService.getUser(id);
+		
+		EntityModel<User> model=EntityModel.of(user);
+		WebMvcLinkBuilder linkToUsers=linkTo(methodOn(this.getClass()).getAllUsers());
+		model.add(linkToUsers.withRel("all-users"));
+		
+		return new ResponseEntity<Object>(model,HttpStatus.OK);
 	}
 	
 	@PostMapping(path="/users")

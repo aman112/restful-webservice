@@ -19,16 +19,16 @@ public class UserService {
 	@Autowired
 	UserDao userDao;
 	
-	public ResponseEntity<List<User>> getAllUsers(){
-		return ResponseEntity.ok(userDao.getAllUsers());
+	public List<User> getAllUsers(){
+		return userDao.getAllUsers();
 	}
 	
-	public ResponseEntity<User> getUser(int id) {
+	public User getUser(int id) {
 		User user=userDao.getUser(id);
 		if(user==null) {
 			throw new UserNotFoundException("User doesn't exist");
 		}
-		return ResponseEntity.ok(user);
+		return user;
 	}
 	
 	public ResponseEntity<Object> saveUser(User u) {
