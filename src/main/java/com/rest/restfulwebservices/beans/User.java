@@ -2,10 +2,18 @@ package com.rest.restfulwebservices.beans;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
+
 public class User {
 	private Long id;
+	
+	@Size(min=2,message="Name should be atleast two characters long")
 	private String name;
+	
 	private int age;
+	
+	@Past(message="Date of Birth should be past date")
 	private LocalDate dob;
 	
 	public User() {
