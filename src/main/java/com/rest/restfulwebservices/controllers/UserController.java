@@ -1,12 +1,15 @@
 package com.rest.restfulwebservices.controllers;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 
 import javax.validation.Valid;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,9 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
+	@Autowired
+	MessageSource messageSource;
+	
 	@GetMapping(path="/users")
 	public ResponseEntity<List<User>> getAllUsers(){
 		List<User> users= userService.getAllUsers();
@@ -39,7 +45,9 @@ public class UserController {
 		
 		EntityModel<User> model=EntityModel.of(user);
 		WebMvcLinkBuilder linkToUsers=linkTo(methodOn(this.getClass()).getAllUsers());
-		model.add(linkToUsers.withRel("all-users"));
+		model.add(linkToUsers
+				.withRel(messageSource.getMessage("all-users-rel-link", null, LocaleContextHolder.getLocale())));
+		//model.add(linkToUsers.withRel("all-users"));
 		
 		return new ResponseEntity<Object>(model,HttpStatus.OK);
 	}

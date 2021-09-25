@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ public class UserService {
 	@Autowired
 	UserDao userDao;
 	
+	@Autowired
+	MessageSource messageSource;
+	
 	public List<User> getAllUsers(){
 		return userDao.getAllUsers();
 	}
@@ -26,7 +31,9 @@ public class UserService {
 	public User getUser(int id) {
 		User user=userDao.getUser(id);
 		if(user==null) {
-			throw new UserNotFoundException("User doesn't exist");
+			throw new UserNotFoundException(
+					messageSource.getMessage("user-notfound-exception-get", null, LocaleContextHolder.getLocale()));
+			//throw new UserNotFoundException("User doesn't exist");
 		}
 		return user;
 	}
@@ -35,22 +42,26 @@ public class UserService {
 		User savedUser=userDao.saveUser(u);
 		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();
 		
-		return ResponseEntity.created(location).body("User created suceesfully...");
+		return ResponseEntity.created(location).body(
+				messageSource.getMessage("user-created-success",null, LocaleContextHolder.getLocale()));
+		//return ResponseEntity.created(location).body("User created suceesfully...");
 	}
 	
 	public ResponseEntity<String> deleteAllUsers() {
 		int deleted=userDao.deleteAllUsers();
 		if(deleted==-1) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All users already been deleted!!");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));
 		}
-		return ResponseEntity.ok("All users deleted!!");
+		return ResponseEntity.ok(messageSource.getMessage("all-users-deleted", null, LocaleContextHolder.getLocale()));
 	}
 	
 	public ResponseEntity<String> deleteUser(int id) {
 		int deleted=userDao.deleteUser(id);
 		if(deleted==-1) {
-			throw new UserNotFoundException("User trying to delete doesn't exist!!");
+			throw new UserNotFoundException(
+					messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));
 		}
-		return ResponseEntity.ok("User deleted!!");
+		return ResponseEntity.ok(messageSource.getMessage("user-deleted-success", null, LocaleContextHolder.getLocale()));
 	}
 }
