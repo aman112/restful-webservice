@@ -2,6 +2,7 @@ package com.rest.restfulwebservices.repositories;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -39,10 +40,34 @@ public class UserDao {
 		if(u.getId()==null) {
 			u.setId(++usersCount);
 		}
+		users.add(u);
 		return u;
 	}
 	
-	//delete users
-	//delete user
+	//delete All users
+	public int deleteAllUsers() {
+		int deleted=-1;
+		if(users.size()>0) {
+			users.clear();
+			usersCount=0;
+			
+			deleted=0;
+		}
+		return deleted;
+	}
 	
+	//delete user
+	public int deleteUser(int id) {
+		int deleted=-1;
+		Iterator<User> itr=users.iterator();
+		while(itr.hasNext()) {
+			User u=itr.next();
+			if(u.getId()==id) {
+				itr.remove();
+				deleted=0;
+				break;
+			}
+		}
+		return deleted;
+	}
 }

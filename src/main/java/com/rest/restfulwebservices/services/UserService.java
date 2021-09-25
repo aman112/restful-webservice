@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,16 +19,16 @@ public class UserService {
 	@Autowired
 	UserDao userDao;
 	
-	public List<User> getAllUsers(){
-		return userDao.getAllUsers();
+	public ResponseEntity<List<User>> getAllUsers(){
+		return ResponseEntity.ok(userDao.getAllUsers());
 	}
 	
-	public User getUser(int id) {
+	public ResponseEntity<User> getUser(int id) {
 		User user=userDao.getUser(id);
 		if(user==null) {
 			throw new UserNotFoundException("User doesn't exist");
 		}
-		return user;
+		return ResponseEntity.ok(user);
 	}
 	
 	public ResponseEntity<Object> saveUser(User u) {
@@ -37,7 +38,19 @@ public class UserService {
 		return ResponseEntity.created(location).body("User created suceesfully...");
 	}
 	
-	//delete users
+	public ResponseEntity<String> deleteAllUsers() {
+		int deleted=userDao.deleteAllUsers();
+		if(deleted==-1) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("All users already been deleted!!");
+		}
+		return ResponseEntity.ok("All users deleted!!");
+	}
 	
-	//delete user
+	public ResponseEntity<String> deleteUser(int id) {
+		int deleted=userDao.deleteUser(id);
+		if(deleted==-1) {
+			throw new UserNotFoundException("User trying to delete doesn't exist!!");
+		}
+		return ResponseEntity.ok("User deleted!!");
+	}
 }
