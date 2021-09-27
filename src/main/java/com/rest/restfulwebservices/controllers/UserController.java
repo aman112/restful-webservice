@@ -39,7 +39,7 @@ public class UserController {
 		return new ResponseEntity<List<User>>(users,HttpStatus.OK);
 	}
 	
-	@GetMapping(path="/users/{id}")
+	@GetMapping(path="/users/{id}",produces="application/xml")
 	public ResponseEntity<Object> getUser(@PathVariable int id) {
 		User user= userService.getUser(id);
 		
