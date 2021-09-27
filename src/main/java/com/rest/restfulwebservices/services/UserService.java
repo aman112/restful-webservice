@@ -2,6 +2,7 @@ package com.rest.restfulwebservices.services;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,55 +14,64 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.rest.restfulwebservices.beans.User;
 import com.rest.restfulwebservices.exceptions.UserNotFoundException;
-import com.rest.restfulwebservices.repositories.UserDao;
+//import com.rest.restfulwebservices.repositories.UserDao;
+import com.rest.restfulwebservices.repositories.UserRepository;
 
 @Service
 public class UserService {
 
+	/*@Autowired
+	UserDao userDao;*/
+	
 	@Autowired
-	UserDao userDao;
+	UserRepository userRepository;
 	
 	@Autowired
 	MessageSource messageSource;
 	
 	public List<User> getAllUsers(){
-		return userDao.getAllUsers();
+		return userRepository.findAll();
 	}
 	
-	public User getUser(int id) {
-		User user=userDao.getUser(id);
-		if(user==null) {
+	public User getUser(long id) {
+		Optional<User> userOp=userRepository.findById(id);
+		if(!userOp.isPresent()) {
 			throw new UserNotFoundException(
 					messageSource.getMessage("user-notfound-exception-get", null, LocaleContextHolder.getLocale()));
 			//throw new UserNotFoundException("User doesn't exist");
 		}
-		return user;
+		return userOp.get();
 	}
 	
 	public ResponseEntity<Object> saveUser(User u) {
-		User savedUser=userDao.saveUser(u);
+		User savedUser=userRepository.save(u);
 		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();
 		
 		return ResponseEntity.created(location).body(
 				messageSource.getMessage("user-created-success",null, LocaleContextHolder.getLocale()));
-		//return ResponseEntity.created(location).body("User created suceesfully...");
+		//return ResponseEntity.created(location).body("User created successfully...");
 	}
 	
 	public ResponseEntity<String> deleteAllUsers() {
-		int deleted=userDao.deleteAllUsers();
-		if(deleted==-1) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));
+		if(userRepository.count()>0) {
+			userRepository.deleteAll();
+
+			return ResponseEntity.ok(messageSource.getMessage("all-users-deleted", null, LocaleContextHolder.getLocale()));
 		}
-		return ResponseEntity.ok(messageSource.getMessage("all-users-deleted", null, LocaleContextHolder.getLocale()));
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(messageSource.getMessage("all-users-deleted-notfound", null, LocaleContextHolder.getLocale()));
+		}
 	}
 	
-	public ResponseEntity<String> deleteUser(int id) {
-		int deleted=userDao.deleteUser(id);
-		if(deleted==-1) {
-			throw new UserNotFoundException(
-					messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));
+	public ResponseEntity<String> deleteUser(long id) {
+		if(userRepository.findById(id).isPresent()) {
+			userRepository.deleteById(id);
+			return ResponseEntity.ok(messageSource.getMessage("user-deleted-success", null, LocaleContextHolder.getLocale()));
 		}
-		return ResponseEntity.ok(messageSource.getMessage("user-deleted-success", null, LocaleContextHolder.getLocale()));
+		else {
+			throw new UserNotFoundException(
+				messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));	
+		}
 	}
 }
