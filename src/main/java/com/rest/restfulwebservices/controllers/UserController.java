@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rest.restfulwebservices.beans.Post;
 import com.rest.restfulwebservices.beans.User;
 import com.rest.restfulwebservices.services.UserService;
 
@@ -42,7 +43,6 @@ public class UserController {
 	@GetMapping(path="/users/{id}")
 	public ResponseEntity<Object> getUser(@PathVariable int id) {
 		User user= userService.getUser(id);
-		
 		EntityModel<User> model=EntityModel.of(user);
 		WebMvcLinkBuilder linkToUsers=linkTo(methodOn(this.getClass()).getAllUsers());
 		model.add(linkToUsers
@@ -67,4 +67,29 @@ public class UserController {
 		return userService.deleteUser(id);
 	}
 	
+	@GetMapping(path="/users/{id}/posts")
+	public ResponseEntity<List<Post>> getAllPostsByUser(@PathVariable("id") Long userId) {
+		List<Post> posts= userService.getAllPostsByUser(userId);
+		return new ResponseEntity<List<Post>>(posts,HttpStatus.OK);
+	}
+	
+	@GetMapping(path="/users/{id}/posts/{postid}")
+	public void getPostByUser(@PathVariable("id") Long userId, @PathVariable("postid") Long postId) {
+		
+	}
+	
+	@PostMapping(path="/users/{id}/posts")
+	public void savePostsByUser(@PathVariable("id") Long userId, @RequestBody Post post) {
+		userService.savePostsByUser(userId, post);
+	}
+	
+	@DeleteMapping(path="/users/{id}/posts")
+	public void deleteAllPostsByUser(@PathVariable("id") Long id) {
+		
+	}
+	
+	@DeleteMapping(path="/users/{id}/posts/{postid}")
+	public void deletePostByUser(@PathVariable("id") Long userId, @PathVariable("postid") int postId) {
+		
+	}
 }

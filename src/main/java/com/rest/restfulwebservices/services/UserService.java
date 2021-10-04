@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.rest.restfulwebservices.beans.Post;
 import com.rest.restfulwebservices.beans.User;
 import com.rest.restfulwebservices.exceptions.UserNotFoundException;
+import com.rest.restfulwebservices.repositories.PostRepository;
 //import com.rest.restfulwebservices.repositories.UserDao;
 import com.rest.restfulwebservices.repositories.UserRepository;
 
@@ -25,6 +27,9 @@ public class UserService {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	PostRepository postRepository;
 	
 	@Autowired
 	MessageSource messageSource;
@@ -73,5 +78,29 @@ public class UserService {
 			throw new UserNotFoundException(
 				messageSource.getMessage("user-notfound-exception-delete", null, LocaleContextHolder.getLocale()));	
 		}
+	}
+	
+	public List<Post> getAllPostsByUser(Long userId) {
+		User user = getUser(userId);
+		return user.getPosts();
+	}
+	public void getPostByUser(Long userId, Long postId) {
+		
+	}
+	
+	public void savePostsByUser(Long userId,Post post) {
+		User user=getUser(userId);
+		post.setUser(user);
+		
+		Post newPost=postRepository.save(post);
+		System.out.println("Post saved::"+newPost.toString());
+	}
+	
+	public void deleteAllPostsByUser(Long userId) {
+		
+	}
+	
+	public void deletePostByUser(Long userId, Long postId) {
+		
 	}
 }
