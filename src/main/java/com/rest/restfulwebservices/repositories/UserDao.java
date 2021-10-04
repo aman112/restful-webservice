@@ -21,11 +21,11 @@ public class UserDao {
 	}
 	
 	//retrieve all
-	public List<User> getAllUsers(){
+	public List<User> findAll(){
 		return users;
 	}
 	//retrieve user
-	public User getUser(int id) {
+	public User findById(int id) {
 		User u=null;
 		for(User u1:users) {
 			if(u1.getId()==id) {
@@ -36,7 +36,7 @@ public class UserDao {
 		return u;
 	}
 	//save user
-	public User saveUser(User u) {
+	public User save(User u) {
 		if(u.getId()==null) {
 			u.setId(++usersCount);
 		}
@@ -45,7 +45,7 @@ public class UserDao {
 	}
 	
 	//delete All users
-	public int deleteAllUsers() {
+	public int deleteAll() {
 		int deleted=-1;
 		if(users.size()>0) {
 			users.clear();
@@ -57,7 +57,7 @@ public class UserDao {
 	}
 	
 	//delete user
-	public int deleteUser(int id) {
+	public int deleteById(long id) {
 		int deleted=-1;
 		Iterator<User> itr=users.iterator();
 		while(itr.hasNext()) {
